@@ -1,9 +1,9 @@
-// src/components/ParkinsonPredictor.tsx
+
 import React, { useState } from "react";
 
 type PredictionRow = {
   name: string;
-  probability: number;       // 0-1 arası
+  probability: number;       
   predictedLabel: "Parkinson" | "Healthy";
   trueLabel?: "Parkinson" | "Healthy";
 };
@@ -26,7 +26,6 @@ const REQUIRED_COLUMNS = [
   "Shimmer:DDA",
   "NHR",
   "HNR",
-  // "status" burada opsiyonel olarak düşünülebilir
   "RPDE",
   "DFA",
   "spread1",
@@ -46,7 +45,7 @@ export const ParkinsonPredictor: React.FC = () => {
     const f = e.target.files?.[0];
     if (!f) return;
 
-    // Basit format kontrolü
+
     if (!f.name.endsWith(".csv") && !f.name.endsWith(".xlsx") && !f.name.endsWith(".xls")) {
       setError("Lütfen .csv veya .xlsx formatında bir dosya yükleyin.");
       setFile(null);
@@ -70,7 +69,7 @@ export const ParkinsonPredictor: React.FC = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      // Burayı kendi backend endpoint’inle değiştir:
+      
       const response = await fetch("http://localhost:8000/predict-parkinsons", {
         method: "POST",
         body: formData,
@@ -107,7 +106,7 @@ export const ParkinsonPredictor: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center py-10 px-4">
       <div className="w-full max-w-5xl space-y-8">
-        {/* Header */}
+        
         <header className="text-center space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight">
             Parkinson Risk Tahmin Paneli
@@ -118,7 +117,7 @@ export const ParkinsonPredictor: React.FC = () => {
           </p>
         </header>
 
-        {/* Stepper (statik görsel olarak) */}
+        
         <div className="flex justify-center gap-6 text-sm">
           <div className="flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">
@@ -140,9 +139,9 @@ export const ParkinsonPredictor: React.FC = () => {
           </div>
         </div>
 
-        {/* Upload & Actions */}
+        
         <div className="grid md:grid-cols-3 gap-6">
-          {/* Upload card */}
+          
           <div className="md:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
             <h2 className="font-semibold text-lg">Veri Yükleme</h2>
             <p className="text-sm text-slate-600">
@@ -190,7 +189,7 @@ export const ParkinsonPredictor: React.FC = () => {
             </button>
           </div>
 
-          {/* Info card (gerekli kolonlar) */}
+          
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3">
             <h3 className="font-semibold text-sm">Beklenen sütunlar</h3>
             <p className="text-xs text-slate-600">
@@ -213,10 +212,10 @@ export const ParkinsonPredictor: React.FC = () => {
           </div>
         </div>
 
-        {/* Results */}
+        
         {predictions.length > 0 && (
           <section className="space-y-4">
-            {/* Summary */}
+            
             <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
                 <div className="text-xs text-slate-500">Toplam Hasta</div>
@@ -240,7 +239,7 @@ export const ParkinsonPredictor: React.FC = () => {
               </div>
             </div>
 
-            {/* Filter & Table */}
+            
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <h2 className="font-semibold text-sm">
