@@ -49,7 +49,7 @@ def _read_uploaded_file(file: UploadFile) -> pd.DataFrame:
             detail="Sadece .csv veya .xlsx/.xls dosyaları destekleniyor.",
         )
 
-    # 1) Kolon adlarını temizle (gizli boşluklar çok vuruyor)
+    
     df.columns = [str(c).strip() for c in df.columns]
     return df
 
@@ -72,18 +72,16 @@ def _coerce_features_to_numeric(df: pd.DataFrame) -> pd.DataFrame:
     X = df[FEATURE_COLUMNS].copy()
 
     for col in FEATURE_COLUMNS:
-        # her şeyi stringe çek, virgülü noktaya çevir
+        
         s = X[col].astype(str).str.replace(",", ".", regex=False)
 
-        # sayısala çevir
+        
         X[col] = pd.to_numeric(s, errors="coerce")
 
-    # NaN kontrolü
+    
     nan_counts = X.isna().sum()
     total_nans = int(nan_counts.sum())
     if total_nans > 0:
-        # İstersen burada strateji seçebilirsin:
-        # 1) hata fırlat (en doğru yaklaşım)
         bad_cols = nan_counts[nan_counts > 0].to_dict()
         raise HTTPException(
             status_code=400,
@@ -94,8 +92,6 @@ def _coerce_features_to_numeric(df: pd.DataFrame) -> pd.DataFrame:
             ),
         )
 
-        # 2) alternatif: doldur (istemiyorsan KULLANMA)
-        # X = X.fillna(X.median(numeric_only=True))
 
     return X
 
@@ -129,13 +125,13 @@ async def predict_parkinsons(file: UploadFile = File(...)):
     df = _read_uploaded_file(file)
     _check_columns(df)
 
-    # İsim kolonunu hazırla
+    
     if NAME_COLUMN in df.columns:
         names = df[NAME_COLUMN].astype(str).tolist()
     else:
         names = [f"Patient {i+1}" for i in range(len(df))]
 
-    # Gerçek etiket varsa sakla
+    
     true_labels = None
     if STATUS_COLUMN in df.columns:
         def map_status(x):
@@ -146,18 +142,17 @@ async def predict_parkinsons(file: UploadFile = File(...)):
             return "Parkinson" if x_int == 1 else "Healthy"
         true_labels = df[STATUS_COLUMN].map(map_status).tolist()
 
-    # 2) Feature matrisi: SAYISALA ZORLA
+    
     X = _coerce_features_to_numeric(df)
 
-    # Tahmin olasılıkları
+    
     try:
         proba = model.predict_proba(X)[:, 1]
     except AttributeError:
         scores = model.decision_function(X)
         proba = _safe_probability_output(scores)
 
-    # Debug: proba gerçekten değişiyor mu?
-    # (İstersen print yerine logging kullan)
+   
     uniq = np.unique(np.round(proba, 6))
     print(f"[DEBUG] rows={len(df)} unique_proba_count={len(uniq)} sample_unique_proba={uniq[:10]}")
 
